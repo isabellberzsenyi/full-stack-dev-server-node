@@ -1,37 +1,44 @@
 import posts from "./tuits/tuits.js";
+import * as tuitsDao from "./tuits/tuits-dao.js";
 let tuits = posts;
 
-const createTuit = (req, res) => {
-  const newTuit = req.body;
-  newTuit._id = (new Date()).getTime() + '';
-  newTuit.likes = 0;
-  newTuit.topic = "Web Development";
-  newTuit.userName = "ReactJS";
-  newTuit.verified = false;
-  newTuit.handle = "ReactJS";
-  newTuit.time = "2h";
-  newTuit['avatar-image'] = "/tuiter/images/nasa.png";
-  newTuit.logoImage = "/tuiter/images/nasa.png";
-  newTuit.stats = {
-    "comments": 123,
-    "retuits": 234,
-    "likes": 345
-  };
-  tuits.push(newTuit);
-  res.json(newTuit);
+const createTuit = async (req, res) => {
+  const newTuit = {
+    ...req.body,
+    "topic": "Web Development!",
+    "userName": "ReactJS",
+    "verified": false,
+    "handle": "ReactJS",
+    "time": "2h",
+    "title": "React.js is a component based front end library that makes it very easy to build Single Page Applications or SPAs",
+    "attachments": {
+      "video": "unKvMC3Y1kI"
+    },
+    "logoImage": "/tuiter/images/reactjs.png",
+    "avatar-image": "/tuiter/images/reactjs.png",
+    "stats": {
+      "comments": 123,
+      "retweets": 234,
+      "likes": 345
+    }
+  }
+
+  const insertTuit = await tuitsDao.createTuit(newTuit);
+  res.json(insertTuit);
 }
-const findAllTuits = (req, res) => {
+const findAllTuits = async (req, res) => {
+  const tuits = await tuitsDao.findAllTuits();
   res.json(tuits);
 }
-const updateTuit = (req, res) => {
+const updateTuit = async (req, res) => {
   const tuitdIdToUpdate = req.params.tid;
   const updatedTuit = req.body;
-  tuits = tuits.map(t => t._id === tuitdIdToUpdate ? updatedTuit : t);
+  await tuitsDao.updateTuit(tuitdIdToUpdate, updatedTuit);
   res.sendStatus(200);
 }
-const deleteTuit = (req, res) => {
-  const tuitIdToDelete = req.params.id;
-  tuits = tuits.filter(t => t._id !== tuitIdToDelete);
+const deleteTuit = async (req, res) => {
+  const tuitIdToDelete = req.params.tid;
+  await tuitsDao.deleteTuit(tuitIdToDelete);
   res.sendStatus(200);
 }
 
